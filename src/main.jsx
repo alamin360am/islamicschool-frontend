@@ -82,7 +82,7 @@ const router = createBrowserRouter([
       { path: "/qa", element: <QnA /> },
       { path: "/forget-password", element: <ForgotPassword /> },
       { path: "/reset-password/:token", element: <ResetPassword /> },
-      // Payment TODO
+      // Payment
       { path: "/payment/success", element: <PaymentSuccess /> },
       { path: "/payment/cancel", element: <PaymentCancel /> },
       { path: "/my-courses", element: <MyCourses /> },
