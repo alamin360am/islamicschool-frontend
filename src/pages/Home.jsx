@@ -17,17 +17,6 @@ import FeaturedCourses from "../components/FeaturedCourses";
 import Carousel from "../components/Carousel";
 
 const Home = () => {
-  // const floatingAnimation = {
-  //   animate: {
-  //     y: [0, -15, 0],
-  //     transition: {
-  //       duration: 3,
-  //       repeat: Infinity,
-  //       ease: "easeInOut"
-  //     }
-  //   }
-  // };
-
   const bounceAnimation = {
     whileHover: {
       scale: 1.05,
@@ -63,117 +52,9 @@ const Home = () => {
           </motion.div>
         ))}
       </div>
-      <section
-        id="home"
-        className="overflow-hidden"
-      >
+      <section id="home" className="overflow-hidden">
         <Carousel />
       </section>
-
-      {/* 
-     
-      <section
-        id="home"
-        className="relative pt-40 bg-gradient-to-r from-green-600 to-emerald-500 text-white py-28 px-6 md:px-20 text-center overflow-hidden"
-      >
-        <motion.div
-          className="absolute top-10 left-10 w-20 h-20 bg-yellow-300 rounded-full opacity-20"
-          animate={{
-            scale: [1, 1.2, 1],
-            rotate: [0, 180, 360],
-          }}
-          transition={{ duration: 8, repeat: Infinity }}
-        />
-        <motion.div
-          className="absolute bottom-20 right-20 w-16 h-16 bg-white rounded-full opacity-20"
-          animate={{
-            scale: [1.2, 1, 1.2],
-            y: [0, -20, 0],
-          }}
-          transition={{ duration: 6, repeat: Infinity }}
-        />
-
-        <div className="relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <motion.h1
-              className="text-4xl md:text-6xl font-extrabold mb-4"
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              Fun Islamic Learning{" "}
-              <motion.span
-                className="text-yellow-300 inline-block"
-                animate={{ rotate: [0, 10, -10, 0] }}
-                transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-              >
-                for Kids
-              </motion.span>
-            </motion.h1>
-            
-            <motion.p
-              className="text-lg md:text-xl mb-6 max-w-2xl mx-auto"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-            >
-              Interactive Quran, Duas, and Islamic manners courses designed
-              especially for children.
-            </motion.p>
-            
-            <motion.div
-              className="flex justify-center items-center gap-4 flex-wrap"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.6 }}
-            >
-              <motion.div {...bounceAnimation}>
-                <Link
-                  to={"/courses"}
-                  className="bg-white text-green-700 px-6 py-3 rounded-2xl font-semibold hover:bg-yellow-200 transition flex items-center shadow-lg"
-                >
-                  <FiBook className="mr-2" />
-                  Explore Courses
-                  <FiArrowRight className="ml-2" />
-                </Link>
-              </motion.div>
-              
-              <motion.div {...bounceAnimation}>
-                <Link
-                  to={"/signup"}
-                  className="border border-white px-6 py-3 rounded-2xl font-semibold hover:bg-white hover:text-green-700 transition shadow-lg"
-                >
-                  <FiSmile className="inline mr-2" />
-                  Join Now
-                </Link>
-              </motion.div>
-            </motion.div>
-          </motion.div>
-        </div>
-
-        <motion.div
-          className="absolute bottom-10 left-1/4"
-          variants={floatingAnimation}
-          animate="animate"
-        >
-          <div className="text-4xl">📚</div>
-        </motion.div>
-        
-        <motion.div
-          className="absolute top-20 right-1/4"
-          variants={floatingAnimation}
-          animate="animate"
-          style={{ animationDelay: "1s" }}
-        >
-          <div className="text-4xl">🕌</div>
-        </motion.div>
-      </section>
-     
-     */}
 
       {/* Courses Section with Enhanced Animations */}
       <section className="relative py-16 bg-gradient-to-b from-blue-50 to-white px-6 z-10">
