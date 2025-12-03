@@ -14,29 +14,15 @@ import {
   FiYoutube,
   FiExternalLink,
   FiHome,
-  FiPlay
 } from "react-icons/fi";
 import api from "../utils/axios";
 
-/**
- * LearningPage (YouTube-style layout)
- * - Sidebar width: w-80 (320px)
- * - Video at top (responsive)
- * - Sidebar collapsible (slides over on mobile, persistent on desktop)
- * - Modern, clean UI (Tailwind)
- *
- * Notes:
- * - Avoid direct window.innerWidth usage in render: we keep `isDesktop` state.
- * - Keep original API calls and action behaviors (mark complete/navigation).
- */
-
-const SIDEBAR_WIDTH_CLASS = "w-80"; // tailwind w-80 = 20rem = 320px
+const SIDEBAR_WIDTH_CLASS = "w-80";
 
 const LearningPage = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
 
-  // Data states
   const [course, setCourse] = useState(null);
   const [lectures, setLectures] = useState([]);
   const [currentLecture, setCurrentLecture] = useState(null);
@@ -44,7 +30,6 @@ const LearningPage = () => {
   const [completedLectures, setCompletedLectures] = useState([]);
   const [progress, setProgress] = useState(0);
 
-  // UI states
   const [loading, setLoading] = useState(true);
   const [videoError, setVideoError] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -52,12 +37,10 @@ const LearningPage = () => {
 
   const containerRef = useRef(null);
 
-  // Initialize responsive state
   useEffect(() => {
     const onResize = () => {
-      const desktop = window.innerWidth >= 1024; // lg breakpoint
+      const desktop = window.innerWidth >= 1024;
       setIsDesktop(desktop);
-      // open sidebar by default on desktop, closed on mobile
       setSidebarOpen(desktop);
     };
     onResize();
@@ -65,7 +48,6 @@ const LearningPage = () => {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  // Fetch course, lectures and enrollment
   useEffect(() => {
     fetchCourseData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -98,14 +80,12 @@ const LearningPage = () => {
       }
     } catch (err) {
       console.error("fetchCourseData:", err);
-      // safe fallback: navigate back to my-courses
       navigate("/my-courses");
     } finally {
       setLoading(false);
     }
   };
 
-  // Helpers: YouTube id & embed URL
   const getYouTubeVideoId = useCallback((url) => {
     if (!url) return null;
     const regex = /(?:v=|\/embed\/|\.be\/)([^#&?]{11})/;
@@ -118,7 +98,6 @@ const LearningPage = () => {
     if (videoUrl.includes("youtube.com") || videoUrl.includes("youtu.be")) {
       return !!getYouTubeVideoId(videoUrl);
     }
-    // If not youtube, assume playable (could be direct mp4 in future)
     return true;
   }, [getYouTubeVideoId]);
 
@@ -128,7 +107,6 @@ const LearningPage = () => {
     return `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1&playsinline=1&controls=1`;
   }, [getYouTubeVideoId]);
 
-  // Mark lecture complete
   const markLectureComplete = async (lectureId) => {
     if (!enrollment?._id) return;
     try {
@@ -143,7 +121,6 @@ const LearningPage = () => {
         });
         setProgress(data.enrollment?.progress ?? progress);
 
-        // Auto advance to next lecture if it exists
         const idx = lectures.findIndex((l) => l._id === lectureId);
         if (idx >= 0 && idx < lectures.length - 1) {
           setCurrentLecture(lectures[idx + 1]);
@@ -155,13 +132,11 @@ const LearningPage = () => {
     }
   };
 
-  // Toggle completion (prevent duplicate)
   const toggleLectureCompletion = (lectureId) => {
     if (completedLectures.includes(lectureId)) return;
     markLectureComplete(lectureId);
   };
 
-  // Navigation helpers
   const getCurrentLectureIndex = () =>
     lectures.findIndex((l) => l._id === currentLecture?._id);
 
@@ -170,7 +145,6 @@ const LearningPage = () => {
     if (idx >= 0 && idx < lectures.length - 1) {
       setCurrentLecture(lectures[idx + 1]);
       setVideoError(false);
-      // On mobile, close sidebar to show video
       if (!isDesktop) setSidebarOpen(false);
     }
   };
@@ -194,7 +168,6 @@ const LearningPage = () => {
     setVideoError(true);
   };
 
-  // Video player component (YouTube embed)
   const VideoPlayer = ({ lecture }) => {
     if (!lecture || !lecture.videoUrl) {
       return (
@@ -279,7 +252,6 @@ const LearningPage = () => {
     );
   };
 
-  // Loading / not found states
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 text-white">
@@ -313,7 +285,6 @@ const LearningPage = () => {
     );
   }
 
-  // computed booleans
   const currentIndex = getCurrentLectureIndex();
   const hasNextLecture = currentIndex >= 0 && currentIndex < lectures.length - 1;
   const hasPrevLecture = currentIndex > 0;
@@ -321,10 +292,9 @@ const LearningPage = () => {
     ? completedLectures.includes(currentLecture._id)
     : false;
 
-  // UI Render
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
-      {/* Topbar */}
+      {/* Top */}
       <header className="sticky top-0 z-40 bg-gray-800/70 backdrop-blur border-b border-gray-700/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="h-16 flex items-center justify-between">
@@ -396,7 +366,7 @@ const LearningPage = () => {
 
                   <div className="min-w-0">
                     <div className="text-sm font-semibold truncate">{course.title}</div>
-                    <div className="text-xs text-gray-400 truncate">{course.category?.name || "Uncategorized"}</div>
+                    <div className="text-xs text-gray-400 truncate">{course.category?.name || "UnCategorized"}</div>
                   </div>
                 </div>
 
@@ -491,7 +461,7 @@ const LearningPage = () => {
                   <div className="min-w-0">
                     <h2 className="text-lg lg:text-2xl font-semibold truncate">{currentLecture?.title || "Select a lecture"}</h2>
                     <div className="text-xs text-gray-400 mt-1">
-                      {currentIndex + 1} of {lectures.length} • {course.category?.name || "Uncategorized"}
+                      {currentIndex + 1} of {lectures.length} • {course.category?.name || "UnCategorized"}
                     </div>
                   </div>
 
