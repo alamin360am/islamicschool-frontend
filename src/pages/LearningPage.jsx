@@ -14,14 +14,12 @@ import LectureControls from "../components/LearningPage/LectureControls";
 import ResourcesSection from "../components/LearningPage/ResourcesSection";
 import LoadingState from "../components/LearningPage/LoadingState";
 import ErrorState from "../components/LearningPage/ErrorState";
-
-// Icons
-import {
-  FiRefreshCw,
-} from "react-icons/fi";
+import { useAuth } from "../hooks/useAuth";
+import CourseReview from "../components/LearningPage/CourseReview";
 
 const LearningPage = () => {
   const { courseId } = useParams();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const [course, setCourse] = useState(null);
@@ -70,15 +68,15 @@ const LearningPage = () => {
       if (courseRes.data?.success) {
         setCourse(courseRes.data.course);
       }
-      
+
       if (lecturesRes.data) {
         const lecturesData = lecturesRes.data.lectures || lecturesRes.data;
         setLectures(lecturesData);
-        
+
         if (lecturesData.length > 0) {
           const lastWatched = localStorage.getItem(`last_watched_${courseId}`);
           if (lastWatched) {
-            const lecture = lecturesData.find(l => l._id === lastWatched);
+            const lecture = lecturesData.find((l) => l._id === lastWatched);
             if (lecture) {
               setCurrentLecture(lecture);
             } else {
@@ -89,23 +87,26 @@ const LearningPage = () => {
           }
         }
       }
-      
+
       if (enrollmentRes.data?.success) {
         const e = enrollmentRes.data.enrollment;
         setEnrollment(e);
-        
-        const completedIds = Array.isArray(e.completedLectures) 
+
+        const completedIds = Array.isArray(e.completedLectures)
           ? e.completedLectures.map((l) => l._id || l)
           : [];
-        
+
         setCompletedLectures(completedIds);
         setProgress(e.progress || 0);
         setLastActivity(e.lastActivity || e.updatedAt);
-        
-        localStorage.setItem(`enrollment_${courseId}`, JSON.stringify({
-          completedIds,
-          progress: e.progress
-        }));
+
+        localStorage.setItem(
+          `enrollment_${courseId}`,
+          JSON.stringify({
+            completedIds,
+            progress: e.progress,
+          })
+        );
       }
     } catch (err) {
       console.error("fetchCourseData error:", err.response || err);
@@ -139,13 +140,15 @@ const LearningPage = () => {
         if (data.enrollment) {
           setEnrollment(data.enrollment);
           const completedIds = Array.isArray(data.enrollment.completedLectures)
-            ? data.enrollment.completedLectures.map(l => l._id || l)
+            ? data.enrollment.completedLectures.map((l) => l._id || l)
             : [];
           setCompletedLectures(completedIds);
         }
-        
+
         setProgress(data.progress);
-        setLastActivity(data.enrollment?.lastActivity || data.enrollment?.updatedAt);
+        setLastActivity(
+          data.enrollment?.lastActivity || data.enrollment?.updatedAt
+        );
 
         toast.success(data.message || "Lecture marked as complete!");
 
@@ -155,7 +158,7 @@ const LearningPage = () => {
 
         const idx = lectures.findIndex((l) => l._id === lectureId);
         const nextLecture = lectures[idx + 1];
-        
+
         if (nextLecture && !completedLectures.includes(nextLecture._id)) {
           setTimeout(() => {
             setCurrentLecture(nextLecture);
@@ -189,11 +192,11 @@ const LearningPage = () => {
         if (data.enrollment) {
           setEnrollment(data.enrollment);
           const completedIds = Array.isArray(data.enrollment.completedLectures)
-            ? data.enrollment.completedLectures.map(l => l._id || l)
+            ? data.enrollment.completedLectures.map((l) => l._id || l)
             : [];
           setCompletedLectures(completedIds);
         }
-        
+
         setProgress(data.progress);
         toast.success(data.message || "Lecture marked as incomplete");
       } else {
@@ -294,7 +297,8 @@ const LearningPage = () => {
   }
 
   const currentIndex = getCurrentLectureIndex();
-  const hasNextLecture = currentIndex >= 0 && currentIndex < lectures.length - 1;
+  const hasNextLecture =
+    currentIndex >= 0 && currentIndex < lectures.length - 1;
   const hasPrevLecture = currentIndex > 0;
   const isCurrentLectureCompleted = currentLecture
     ? completedLectures.includes(currentLecture._id)
@@ -374,9 +378,15 @@ const LearningPage = () => {
                 isVideoPlayable={isVideoPlayable}
               />
 
-              {currentLecture?.resources && currentLecture.resources.length > 0 && (
-                <ResourcesSection resources={currentLecture.resources} />
-              )}
+              {currentLecture?.resources &&
+                currentLecture.resources.length > 0 && (
+                  <ResourcesSection resources={currentLecture.resources} />
+                )}
+
+              <CourseReview
+                courseId={courseId}
+                userId={user?._id || "currentUserId"}
+              />
             </div>
           </div>
         </div>

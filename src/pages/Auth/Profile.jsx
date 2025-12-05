@@ -13,28 +13,68 @@ import {
   FiBookOpen,
   FiAward,
   FiBarChart2,
+  FiUpload,
+  FiX,
 } from "react-icons/fi";
-import Avatar from '../../../public/Avatar.jpg'
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useNavigate } from "react-router";
 import toast from "react-hot-toast";
 import { useAuth } from "../../hooks/useAuth.js";
+import api from "../../utils/axios";
 
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState("courses");
+  const [loading, setLoading] = useState(false);
+  const [userData, setUserData] = useState(null);
+  const [editData, setEditData] = useState({
+    name: "",
+    address: "",
+  });
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
+  const fileInputRef = useRef(null);
+  
   const navigate = useNavigate();
-
   const { user, logout } = useAuth();
 
-  const iso = user.createdAt;
+  const fetchUserData = useCallback(async () => {
+    try {
+      const response = await api.get(`/auth/${user._id}`);
+      if (response.data.success) {
+        setUserData(response.data.user);
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      setUserData(user);
+    }
+  }, [user]);
 
-  const date = new Date(iso);
-  const formattedDate = date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  // Fetch user data on component mount
+  useEffect(() => {
+    fetchUserData();
+  }, [fetchUserData]);
+
+  // Initialize editData when user data loads
+  useEffect(() => {
+    if (userData) {
+      setEditData({
+        name: userData.name || "",
+        address: userData.address || "",
+      });
+      setPreviewImage(userData.avatar || null);
+    }
+  }, [userData]);
+
+  
+
+  const formattedDate = userData?.createdAt 
+    ? new Date(userData.createdAt).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : "Unknown date";
 
   const handleLogOut = async () => {
     const success = await logout();
@@ -42,31 +82,16 @@ const Profile = () => {
       navigate("/login");
       toast.success("Logged out successfully");
     } else {
-      toast.field("Logout failed");
+      toast.error("Logout failed");
     }
   };
 
-  const [profileData, setProfileData] = useState({
-    name: "Abdullah Al Mamun",
-    email: "mamun@example.com",
-    phone: "01712345678",
-    address: "Dhaka, Bangladesh",
-    joinDate: "January 15, 2024",
-    children: [
-      { name: "Ayesha", age: 8, progress: 85 },
-      { name: "Mohammad", age: 6, progress: 72 },
-    ],
-  });
-
-  const [editData, setEditData] = useState({ ...profileData });
-
   const handleEditToggle = () => {
     if (isEditing) {
-      setProfileData({ ...editData });
+      handleSaveChanges();
     } else {
-      setEditData({ ...profileData });
+      setIsEditing(true);
     }
-    setIsEditing(!isEditing);
   };
 
   const handleInputChange = (field, value) => {
@@ -74,6 +99,96 @@ const Profile = () => {
       ...prev,
       [field]: value,
     }));
+  };
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Check file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+
+    // Check file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image size should be less than 5MB');
+      return;
+    }
+
+    setSelectedFile(file);
+    
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewImage(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveImage = () => {
+    setSelectedFile(null);
+    setPreviewImage(userData?.avatar || null);
+  };
+
+  const handleSaveChanges = async () => {
+    // Validate inputs
+    if (!editData.name.trim()) {
+      toast.error('Please enter your name');
+      return;
+    }
+
+    setLoading(true);
+    
+    try {
+      // Create FormData object
+      const formData = new FormData();
+      formData.append('name', editData.name.trim());
+      formData.append('address', editData.address?.trim() || '');
+      
+      // Append file if selected
+      if (selectedFile) {
+        formData.append('user', selectedFile);
+      }
+
+      const response = await api.put(
+        `/auth/${userData._id}`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      if (response.data.success) {
+        // Update local state
+        setUserData(prev => ({
+          ...prev,
+          name: editData.name,
+          address: editData.address,
+          ...(response.data.user?.avatar && { avatar: response.data.user.avatar })
+        }));
+        
+        // Show success message
+        toast.success(response.data.message || 'Profile updated successfully!');
+        
+        // Reset states
+        setIsEditing(false);
+        setSelectedFile(null);
+        
+        // Refresh user data
+        fetchUserData();
+      } else {
+        toast.error(response.data.message || 'Failed to update profile');
+      }
+    } catch (error) {
+      console.error('Update error:', error);
+      toast.error(error.response?.data?.message || 'Error updating profile. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const stats = [
@@ -97,12 +212,16 @@ const Profile = () => {
     },
   ];
 
-  const recentActivities = [
-    { action: "Completed Quran Basics", time: "2 hours ago", icon: "📖" },
-    { action: "Earned Perfect Score in Quiz", time: "1 day ago", icon: "🏆" },
-    { action: "Started Arabic Alphabet", time: "2 days ago", icon: "🔤" },
-    { action: "Shared Progress with Teacher", time: "3 days ago", icon: "👨‍🏫" },
-  ];
+  if (!userData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-sky-50 to-green-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50 to-green-50 text-gray-800 font-sans py-8 px-4 pt-24">
@@ -128,18 +247,29 @@ const Profile = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleEditToggle}
+              disabled={loading}
               className={`flex items-center px-6 py-3 rounded-xl font-semibold transition ${
                 isEditing
                   ? "bg-green-600 hover:bg-green-700 text-white"
                   : "bg-white text-green-600 border border-green-600 hover:bg-green-50"
-              }`}
+              } ${loading ? 'opacity-60 cursor-not-allowed' : ''}`}
             >
-              {isEditing ? (
-                <FiSave className="mr-2" />
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Saving...
+                </>
+              ) : isEditing ? (
+                <>
+                  <FiSave className="mr-2" />
+                  Save Changes
+                </>
               ) : (
-                <FiEdit3 className="mr-2" />
+                <>
+                  <FiEdit3 className="mr-2" />
+                  Edit Profile
+                </>
               )}
-              {isEditing ? "Save Changes" : "Edit Profile"}
             </motion.button>
           </div>
         </motion.div>
@@ -156,34 +286,70 @@ const Profile = () => {
               {/* Profile Header */}
               <div className="bg-gradient-to-br from-green-600 to-emerald-500 text-white p-8">
                 <div className="flex items-center">
-                  {/* TODO: Add profile img */}
-                  <div className="relative w-24 h-24 rounded-full">
-                    <img
-                      src={Avatar}
-                      alt="Profile"
-                      className="w-full rounded-full border-4 border-white/20 overflow-hidden"
-                    />
-                    <div className="absolute bottom-0 right-0 w-8 h-8 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
-                      <FiEdit3 className="text-white text-xs" />
+                  {/* Profile Image Upload */}
+                  <div className="relative mr-6">
+                    <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-white/20">
+                      {previewImage ? (
+                        <img
+                          src={previewImage}
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-green-500 flex items-center justify-center">
+                          <FiUser className="text-white text-4xl" />
+                        </div>
+                      )}
                     </div>
+                    
+                    {isEditing && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="absolute bottom-0 right-0 w-8 h-8 bg-green-500 hover:bg-green-600 rounded-full border-2 border-white flex items-center justify-center cursor-pointer transition"
+                        >
+                          <FiUpload className="text-white text-xs" />
+                        </button>
+                        
+                        {selectedFile && (
+                          <button
+                            type="button"
+                            onClick={handleRemoveImage}
+                            className="absolute top-0 right-0 w-6 h-6 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center cursor-pointer transition"
+                          >
+                            <FiX className="text-white text-xs" />
+                          </button>
+                        )}
+                        
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          onChange={handleFileSelect}
+                          accept="image/*"
+                          className="hidden"
+                        />
+                      </>
+                    )}
                   </div>
-                  <div className="ml-6">
-                    <h2 className="text-2xl font-bold">
+                  
+                  <div className="flex-1">
+                    <h2 className="text-2xl font-bold mb-2">
                       {isEditing ? (
                         <input
                           type="text"
-                          value={user.name}
+                          value={editData.name}
                           onChange={(e) =>
                             handleInputChange("name", e.target.value)
                           }
-                          className="bg-white/20 rounded-lg px-3 py-1 text-white placeholder-white/80 focus:outline-none focus:ring-2 focus:ring-white/50"
+                          className="bg-white/20 rounded-lg px-3 py-1.5 text-white placeholder-white/80 focus:outline-none focus:ring-2 focus:ring-white/50 w-full"
                           placeholder="Enter your name"
                         />
                       ) : (
-                        user.name
+                        userData.name || "User Name"
                       )}
                     </h2>
-                    <div className="flex items-center mt-2 text-green-100 text-sm">
+                    <div className="flex items-center text-green-100 text-sm">
                       <FiCalendar className="mr-1" />
                       <span>Joined {formattedDate}</span>
                     </div>
@@ -200,8 +366,7 @@ const Profile = () => {
                   </div>
                   <div className="flex-1">
                     <p className="text-sm text-gray-500">Email Address</p>
-
-                    <p className="text-gray-800 font-medium">{user.email}</p>
+                    <p className="text-gray-800 font-medium">{userData.email}</p>
                   </div>
                 </div>
 
@@ -212,18 +377,7 @@ const Profile = () => {
                   </div>
                   <div className="flex-1">
                     <p className="text-sm text-gray-500">Phone Number</p>
-                    {isEditing ? (
-                      <input
-                        type="tel"
-                        value={user.phone}
-                        onChange={(e) =>
-                          handleInputChange("phone", e.target.value)
-                        }
-                        className="w-full bg-gray-50 rounded-lg px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-300"
-                      />
-                    ) : (
-                      <p className="text-gray-800 font-medium">{user.phone}</p>
-                    )}
+                    <p className="text-gray-800 font-medium">{userData.phone || "-"}</p>
                   </div>
                 </div>
 
@@ -237,47 +391,49 @@ const Profile = () => {
                     {isEditing ? (
                       <input
                         type="text"
-                        value={user.address}
+                        value={editData.address}
                         onChange={(e) =>
                           handleInputChange("address", e.target.value)
                         }
                         className="w-full bg-gray-50 rounded-lg px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-300"
+                        placeholder="Enter your address"
                       />
                     ) : (
                       <p className="text-gray-800 font-medium">
-                        {user.address ? user.address : "-"}
+                        {userData.address || "-"}
                       </p>
                     )}
                   </div>
                 </div>
 
-                {/* Change Password */}
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full flex items-center justify-center py-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition cursor-pointer"
-                >
-                  <FiLock className="mr-2 text-gray-600" />
-                  <Link
-                    to={"/change-password"}
-                    className="text-gray-700 font-medium"
+                {/* Action Buttons */}
+                <div className="space-y-3 pt-4">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="w-full flex items-center justify-center py-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition cursor-pointer"
                   >
-                    Change Password
-                  </Link>
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full flex items-center justify-center py-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition cursor-pointer"
-                >
-                  <FiLock className="mr-2 text-gray-600" />
-                  <div
+                    <FiLock className="mr-2 text-gray-600" />
+                    <Link
+                      to={"/change-password"}
+                      className="text-gray-700 font-medium"
+                    >
+                      Change Password
+                    </Link>
+                  </motion.button>
+                  
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={handleLogOut}
-                    className="text-gray-700 font-medium"
+                    className="w-full flex items-center justify-center py-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl transition cursor-pointer"
                   >
-                    Log Out
-                  </div>
-                </motion.button>
+                    <FiLock className="mr-2" />
+                    <span className="font-medium">
+                      Log Out
+                    </span>
+                  </motion.button>
+                </div>
               </div>
             </div>
           </motion.div>
@@ -337,30 +493,6 @@ const Profile = () => {
 
               {/* Tab Content */}
               <div className="p-6">
-                {activeTab === "personal" && (
-                  <div className="space-y-4">
-                    {recentActivities.map((activity, index) => (
-                      <motion.div
-                        key={index}
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.4, delay: index * 0.1 }}
-                        className="flex items-center p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition"
-                      >
-                        <span className="text-2xl mr-4">{activity.icon}</span>
-                        <div className="flex-1">
-                          <p className="font-medium text-gray-800">
-                            {activity.action}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            {activity.time}
-                          </p>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                )}
-
                 {activeTab === "courses" && (
                   <div className="text-center py-8">
                     <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -372,7 +504,10 @@ const Profile = () => {
                     <p className="text-gray-600 mb-4">
                       You are currently enrolled in 3 courses
                     </p>
-                    <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition">
+                    <button 
+                      onClick={() => navigate('/courses')}
+                      className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition"
+                    >
                       View All Courses
                     </button>
                   </div>
@@ -396,54 +531,6 @@ const Profile = () => {
                 )}
               </div>
             </div>
-
-            {/* Quick Actions */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="bg-white rounded-2xl shadow-xl p-6 mt-6"
-            >
-              <h3 className="text-xl font-bold text-gray-800 mb-4">
-                Quick Actions
-              </h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[
-                  {
-                    label: "Add Child",
-                    icon: "👶",
-                    color: "bg-blue-100 text-blue-600",
-                  },
-                  {
-                    label: "Progress Report",
-                    icon: "📊",
-                    color: "bg-green-100 text-green-600",
-                  },
-                  {
-                    label: "Settings",
-                    icon: "⚙️",
-                    color: "bg-purple-100 text-purple-600",
-                  },
-                  {
-                    label: "Help Center",
-                    icon: "❓",
-                    color: "bg-orange-100 text-orange-600",
-                  },
-                ].map((action, index) => (
-                  <motion.button
-                    key={index}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className={`flex flex-col items-center p-4 rounded-xl ${action.color} hover:shadow-md transition`}
-                  >
-                    <span className="text-2xl mb-2">{action.icon}</span>
-                    <span className="text-sm font-medium text-center">
-                      {action.label}
-                    </span>
-                  </motion.button>
-                ))}
-              </div>
-            </motion.div>
           </motion.div>
         </div>
       </div>
