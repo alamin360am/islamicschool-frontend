@@ -57,8 +57,12 @@ const NavBar = () => {
                 className="h-6 w-auto md:h-8 lg:h-10 object-contain transition-all duration-300"
               />
               <div className="flex flex-col gap-0">
-                <p className="text-xl font-bold text-white">THE ISLAMIC SCHOOL</p>
-                <span className="text-xs text-gray-300 leading-2 tracking-widest">Learn - Light - Lead with Islam</span>
+                <p className="text-xl font-bold text-white">
+                  THE ISLAMIC SCHOOL
+                </p>
+                <span className="text-xs text-gray-300 leading-2 tracking-widest">
+                  Learn - Light - Lead with Islam
+                </span>
               </div>
             </>
           ) : (
@@ -69,8 +73,12 @@ const NavBar = () => {
                 className="h-6 w-auto md:h-8 lg:h-10 object-contain transition-all duration-300"
               />
               <div className="flex flex-col gap-0">
-                <p className="text-xl font-bold text-blue-900">THE ISLAMIC SCHOOL</p>
-                <span className="text-xs text-blue-600 leading-2 tracking-widest">Learn - Light - Lead with Islam</span>
+                <p className="text-xl font-bold text-blue-900">
+                  THE ISLAMIC SCHOOL
+                </p>
+                <span className="text-xs text-blue-600 leading-2 tracking-widest">
+                  Learn - Light - Lead with Islam
+                </span>
               </div>
             </>
           )}
@@ -98,6 +106,23 @@ const NavBar = () => {
 
           {user ? (
             <>
+              {
+                user.role === "teacher" && 
+                <NavLink
+                to={"/my-courses"}
+                className={({ isActive }) =>
+                  `px-3 py-2 rounded-full transition text-sm lg:text-base ${
+                    isActive
+                      ? "bg-blue-500 text-white shadow-md"
+                      : scrolled
+                      ? "text-white hover:bg-blue-500/50 hover:text-white"
+                      : "text-gray-700 hover:bg-blue-100/50 hover:text-blue-600"
+                  }`
+                }
+              >
+                আমার কোর্সসমুহ
+              </NavLink>
+              }
               <Link
                 to={`/${user.role}`}
                 className={`px-3 py-2 rounded-full transition font-semibold text-sm lg:text-base ${
@@ -106,7 +131,7 @@ const NavBar = () => {
                     : "text-gray-800 hover:bg-blue-100/50 hover:text-blue-600"
                 }`}
               >
-                Dashboard
+                ড্যাশবোর্ড
               </Link>
               <Link
                 to={"/profile"}
@@ -126,7 +151,7 @@ const NavBar = () => {
                     : "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:opacity-90 hover:shadow-lg"
                 }`}
               >
-                Log Out
+                লগ আউট
               </button>
             </>
           ) : (
@@ -196,7 +221,7 @@ const NavBar = () => {
                       : "hover:bg-blue-100/70 hover:text-blue-600"
                   }`}
                 >
-                  Dashboard
+                  ড্যাশবোর্ড
                 </Link>
                 <Link
                   to={"/profile"}
@@ -208,7 +233,7 @@ const NavBar = () => {
                   }`}
                 >
                   <FiUser className="text-xl" />
-                  <span>Profile</span>
+                  <span>প্রোফাইল</span>
                 </Link>
                 <button
                   onClick={() => {
@@ -221,7 +246,7 @@ const NavBar = () => {
                       : "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:shadow-lg"
                   }`}
                 >
-                  Log Out
+                  লগ আউট
                 </button>
               </div>
             ) : (

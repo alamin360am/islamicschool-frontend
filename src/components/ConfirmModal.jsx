@@ -7,10 +7,10 @@ const ConfirmModal = ({
   isOpen, 
   onClose, 
   onConfirm, 
-  title = "Are you sure?", 
-  message = "This action cannot be undone.",
-  confirmText = "Confirm",
-  cancelText = "Cancel",
+  title = "আপনি কি নিশ্চিত?", 
+  message = "এটি পরে পরিবর্তন করা সম্ভব নয়।",
+  confirmText = "কনফার্ম",
+  cancelText = "বাতিল করুন",
   type = "danger", // 'danger', 'warning', 'success'
   loading = false
 }) => {

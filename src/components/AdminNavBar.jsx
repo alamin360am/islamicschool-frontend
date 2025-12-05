@@ -27,15 +27,15 @@ const AdminNavBar = ({ sidebarOpen, setSidebarOpen }) => {
         className={`fixed lg:relative z-50 w-64 h-screen bg-gradient-to-b from-green-600 to-emerald-700 text-white flex flex-col shadow-lg
         ${sidebarOpen ? "block" : "hidden lg:flex"} overflow-y-scroll`}
       >
-        <div className="px-6 pt-6 flex gap-2 items-center text-lg font-medium">
+        <div className="px-6 py-6 flex gap-2 items-center text-lg font-medium">
           <img
             src={logo}
             alt="Website Logo"
             className="h-6 w-auto md:h-8 lg:h-10 object-contain transition-all duration-300"
           />
-          <div>
-            <h2>Admin Dashboard</h2>
-            <p>Manage Everything</p>
+          <div className="flex flex-col">
+            <h2>অ্যাডমিন ড্যাশবোর্ড</h2>
+            <p className="text-xs">সকল এডমিন অ্যাক্সেস এখানে</p>
           </div>
         </div>
 
@@ -69,7 +69,7 @@ const AdminNavBar = ({ sidebarOpen, setSidebarOpen }) => {
             className="w-full flex items-center px-4 py-3 text-green-100 hover:bg-white/10 rounded-xl transition"
           >
             <FaHome className="mr-3" />
-            Go to Home
+            হোমে ফিরে যান
           </button>
         </div>
       </motion.div>

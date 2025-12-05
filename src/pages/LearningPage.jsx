@@ -17,8 +17,10 @@ import {
   FiClock,
   FiCalendar,
   FiUser,
+  FiRefreshCw,
 } from "react-icons/fi";
 import api from "../utils/axios";
+import toast from "react-hot-toast";
 
 const SIDEBAR_WIDTH_CLASS = "w-80";
 
@@ -39,6 +41,7 @@ const LearningPage = () => {
   const [isDesktop, setIsDesktop] = useState(false);
   const [markingComplete, setMarkingComplete] = useState(false);
   const [lastActivity, setLastActivity] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   const containerRef = useRef(null);
   const videoRef = useRef(null);
@@ -68,30 +71,70 @@ const LearningPage = () => {
         api.get(`/enrollment/course/${courseId}`),
       ]);
 
+      console.log('API Responses:', {
+        course: courseRes.data,
+        lectures: lecturesRes.data,
+        enrollment: enrollmentRes.data
+      });
+
       if (courseRes.data?.success) {
         setCourse(courseRes.data.course);
       }
+      
       if (lecturesRes.data) {
-        const lecturesData = lecturesRes.data.lectures || [];
+        const lecturesData = lecturesRes.data.lectures || lecturesRes.data;
+        console.log('Lectures data:', lecturesData);
         setLectures(lecturesData);
-        if (lecturesData.length > 0 && !currentLecture) {
-          setCurrentLecture(lecturesData[0]);
+        
+        if (lecturesData.length > 0) {
+          // Try to get last watched lecture from localStorage
+          const lastWatched = localStorage.getItem(`last_watched_${courseId}`);
+          if (lastWatched) {
+            const lecture = lecturesData.find(l => l._id === lastWatched);
+            if (lecture) {
+              setCurrentLecture(lecture);
+            } else {
+              setCurrentLecture(lecturesData[0]);
+            }
+          } else {
+            setCurrentLecture(lecturesData[0]);
+          }
         }
       }
+      
       if (enrollmentRes.data?.success) {
         const e = enrollmentRes.data.enrollment;
+        console.log('Enrollment data:', e);
         setEnrollment(e);
-        const completedIds = e.completedLectures?.map((l) => l._id) || [];
+        
+        const completedIds = Array.isArray(e.completedLectures) 
+          ? e.completedLectures.map((l) => l._id || l)
+          : [];
+        
+        console.log('Completed lecture IDs:', completedIds);
         setCompletedLectures(completedIds);
         setProgress(e.progress || 0);
-        setLastActivity(e.updatedAt);
+        setLastActivity(e.lastActivity || e.updatedAt);
+        
+        // Save to localStorage for debugging
+        localStorage.setItem(`enrollment_${courseId}`, JSON.stringify({
+          completedIds,
+          progress: e.progress
+        }));
       }
     } catch (err) {
-      console.error("fetchCourseData:", err);
+      console.error("fetchCourseData error:", err.response || err);
+      toast.error("Failed to load course data");
       navigate("/my-courses");
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
+  };
+
+  const refreshData = () => {
+    setRefreshing(true);
+    fetchCourseData();
   };
 
   const getYouTubeVideoId = useCallback((url) => {
@@ -122,43 +165,60 @@ const LearningPage = () => {
   );
 
   const markLectureComplete = async (lectureId) => {
-    if (!enrollment?._id) return;
+    if (!enrollment?._id) {
+      toast.error("Enrollment not found");
+      return;
+    }
 
     setMarkingComplete(true);
     try {
+      console.log('Marking lecture complete:', { enrollmentId: enrollment._id, lectureId });
+      
       const { data } = await api.post(
         `/enrollment/${enrollment._id}/complete-lecture`,
         { lectureId }
       );
 
+      console.log('Complete lecture response:', data);
+
       if (data?.success) {
-        setCompletedLectures((prev) => {
-          if (prev.includes(lectureId)) return prev;
-          return [...prev, lectureId];
-        });
-
-        setProgress(data.progress);
-
+        // Update state with new data
         if (data.enrollment) {
           setEnrollment(data.enrollment);
-          setLastActivity(data.enrollment.updatedAt);
+          const completedIds = Array.isArray(data.enrollment.completedLectures)
+            ? data.enrollment.completedLectures.map(l => l._id || l)
+            : [];
+          setCompletedLectures(completedIds);
+        }
+        
+        setProgress(data.progress);
+        setLastActivity(data.enrollment?.lastActivity || data.enrollment?.updatedAt);
+
+        toast.success(data.message || "Lecture marked as complete!");
+
+        // Save current lecture to localStorage
+        if (currentLecture) {
+          localStorage.setItem(`last_watched_${courseId}`, currentLecture._id);
         }
 
-        showNotification("Lecture marked as complete!", "success");
-
+        // Auto-navigate to next lecture if available and not already completed
         const idx = lectures.findIndex((l) => l._id === lectureId);
-        if (idx >= 0 && idx < lectures.length - 1) {
+        const nextLecture = lectures[idx + 1];
+        
+        if (nextLecture && !completedLectures.includes(nextLecture._id)) {
           setTimeout(() => {
-            setCurrentLecture(lectures[idx + 1]);
+            setCurrentLecture(nextLecture);
             setVideoError(false);
-          }, 1000);
+            toast.info(`Moving to next lecture: ${nextLecture.title}`);
+          }, 1500);
         }
+      } else {
+        toast.error(data?.message || "Failed to mark as complete");
       }
     } catch (err) {
-      console.error("markLectureComplete:", err);
-      showNotification(
-        err.response?.data?.message || "Failed to mark as complete",
-        "error"
+      console.error("markLectureComplete error:", err.response || err);
+      toast.error(
+        err.response?.data?.message || "Failed to mark lecture as complete"
       );
     } finally {
       setMarkingComplete(false);
@@ -175,16 +235,23 @@ const LearningPage = () => {
       );
 
       if (data?.success) {
-        setCompletedLectures((prev) => prev.filter((id) => id !== lectureId));
-        setProgress(data.progress);
+        // Update state
         if (data.enrollment) {
           setEnrollment(data.enrollment);
+          const completedIds = Array.isArray(data.enrollment.completedLectures)
+            ? data.enrollment.completedLectures.map(l => l._id || l)
+            : [];
+          setCompletedLectures(completedIds);
         }
-        showNotification("Lecture marked as incomplete", "info");
+        
+        setProgress(data.progress);
+        toast.success(data.message || "Lecture marked as incomplete");
+      } else {
+        toast.error(data?.message || "Failed to update");
       }
     } catch (err) {
       console.error("markLectureIncomplete:", err);
-      showNotification("Failed to update", "error");
+      toast.error("Failed to update lecture status");
     }
   };
 
@@ -196,27 +263,15 @@ const LearningPage = () => {
     }
   };
 
-  const showNotification = (message, type = "info") => {
-    const toast = document.createElement("div");
-    toast.className = `fixed top-4 right-4 px-4 py-2 rounded-lg z-50 ${
-      type === "success"
-        ? "bg-green-600"
-        : type === "error"
-        ? "bg-red-600"
-        : "bg-blue-600"
-    } text-white`;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
-  };
-
   const getCurrentLectureIndex = () =>
     lectures.findIndex((l) => l._id === currentLecture?._id);
 
   const goToNextLecture = () => {
     const idx = getCurrentLectureIndex();
     if (idx >= 0 && idx < lectures.length - 1) {
-      setCurrentLecture(lectures[idx + 1]);
+      const nextLecture = lectures[idx + 1];
+      setCurrentLecture(nextLecture);
+      localStorage.setItem(`last_watched_${courseId}`, nextLecture._id);
       setVideoError(false);
       if (!isDesktop) setSidebarOpen(false);
       scrollToTop();
@@ -226,7 +281,9 @@ const LearningPage = () => {
   const goToPrevLecture = () => {
     const idx = getCurrentLectureIndex();
     if (idx > 0) {
-      setCurrentLecture(lectures[idx - 1]);
+      const prevLecture = lectures[idx - 1];
+      setCurrentLecture(prevLecture);
+      localStorage.setItem(`last_watched_${courseId}`, prevLecture._id);
       setVideoError(false);
       if (!isDesktop) setSidebarOpen(false);
       scrollToTop();
@@ -245,14 +302,8 @@ const LearningPage = () => {
 
   const handleVideoIframeError = () => {
     setVideoError(true);
+    toast.error("Video failed to load");
   };
-
-  const handleVideoEnd = useCallback(() => {
-    if (currentLecture && !completedLectures.includes(currentLecture._id)) {
-      markLectureComplete(currentLecture._id);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentLecture, completedLectures]);
 
   const formatDate = (dateString) => {
     if (!dateString) return "";
@@ -344,7 +395,6 @@ const LearningPage = () => {
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
             onError={handleVideoIframeError}
-            onEnded={handleVideoEnd}
           />
         </div>
       </div>
@@ -399,7 +449,6 @@ const LearningPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="h-16 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              {/* mobile menu toggle */}
               <button
                 aria-label="Toggle sidebar"
                 onClick={() => setSidebarOpen((v) => !v)}
@@ -427,7 +476,7 @@ const LearningPage = () => {
                   {lastActivity && (
                     <>
                       <FiCalendar size={12} />
-                      Last activity: {formatDate(lastActivity)}
+                      Last: {formatDate(lastActivity)}
                     </>
                   )}
                 </div>
@@ -447,6 +496,15 @@ const LearningPage = () => {
                   {progress}%
                 </div>
               </div>
+
+              <button
+                onClick={refreshData}
+                disabled={refreshing}
+                className="p-2 bg-gray-700/50 rounded-xl hover:bg-gray-700 disabled:opacity-50"
+                title="Refresh data"
+              >
+                <FiRefreshCw className={refreshing ? "animate-spin" : ""} />
+              </button>
 
               <button className="p-2 bg-gray-700/50 rounded-xl hover:bg-gray-700">
                 <FiSettings />
@@ -542,6 +600,7 @@ const LearningPage = () => {
                           key={lecture._id}
                           onClick={() => {
                             setCurrentLecture(lecture);
+                            localStorage.setItem(`last_watched_${courseId}`, lecture._id);
                             if (!isDesktop) setSidebarOpen(false);
                             setVideoError(false);
                           }}
@@ -600,14 +659,24 @@ const LearningPage = () => {
 
                 <div className="mt-4 space-y-2">
                   <button
+                    onClick={refreshData}
+                    disabled={refreshing}
+                    className="w-full px-4 py-2 rounded-xl bg-gray-700/50 hover:bg-gray-700 text-gray-100 flex items-center justify-center gap-2"
+                  >
+                    <FiRefreshCw className={refreshing ? "animate-spin" : ""} />
+                    {refreshing ? "Refreshing..." : "Refresh Data"}
+                  </button>
+                  
+                  <button
                     onClick={() => navigate("/my-courses")}
-                    className="w-full px-4 py-2 rounded-xl bg-gray-700/50 hover:bg-gray-700 text-gray-100"
+                    className="w-full px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500/20 to-purple-500/20 hover:from-blue-500/30 hover:to-purple-500/30 text-gray-100 border border-blue-500/30"
                   >
                     <div className="flex items-center justify-center gap-2">
                       <FiHome /> Back to Courses
                     </div>
                   </button>
-                  <div className="text-xs text-gray-400 text-center">
+                  
+                  <div className="text-xs text-gray-400 text-center pt-2 border-t border-gray-700/30">
                     Last updated: {formatDate(lastActivity)}
                   </div>
                 </div>
@@ -630,7 +699,7 @@ const LearningPage = () => {
                     </h2>
                     <div className="text-xs text-gray-400 mt-1 flex items-center gap-3">
                       <span>
-                        {currentIndex + 1} of {lectures.length} •{" "}
+                        Lecture {currentIndex + 1} of {lectures.length} •{" "}
                         {course.category?.name || "UnCategorized"}
                       </span>
                       {currentLecture?.duration && (
@@ -651,7 +720,7 @@ const LearningPage = () => {
                         className={`px-4 py-2 rounded-xl shadow-md transition-all duration-200 ${
                           isCurrentLectureCompleted
                             ? "bg-gradient-to-r from-green-600/20 to-emerald-600/20 text-green-300 border border-green-600/30"
-                            : "bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:shadow-lg"
+                            : "bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:shadow-lg hover:from-green-600 hover:to-emerald-600"
                         } ${
                           markingComplete ? "opacity-70 cursor-not-allowed" : ""
                         }`}
@@ -666,7 +735,7 @@ const LearningPage = () => {
                             <>
                               <FiCheck />
                               {isCurrentLectureCompleted
-                                ? "Completed"
+                                ? "✓ Completed"
                                 : "Mark Complete"}
                             </>
                           )}
@@ -674,12 +743,14 @@ const LearningPage = () => {
                       </button>
                     )}
 
-                    <button
-                      onClick={openVideoInNewTab}
-                      className="px-3 py-2 rounded-xl bg-gray-700/40 hover:bg-gray-700 flex items-center gap-2 transition"
-                    >
-                      <FiExternalLink /> Open in YouTube
-                    </button>
+                    {currentLecture?.videoUrl && (
+                      <button
+                        onClick={openVideoInNewTab}
+                        className="px-3 py-2 rounded-xl bg-gray-700/40 hover:bg-gray-700 flex items-center gap-2 transition"
+                      >
+                        <FiExternalLink /> Open in YouTube
+                      </button>
+                    )}
                   </div>
                 </div>
 
