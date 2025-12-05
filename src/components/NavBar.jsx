@@ -106,33 +106,34 @@ const NavBar = () => {
 
           {user ? (
             <>
-              {
-                user.role === "teacher" && 
+              {user.role !== "admin" && (
                 <NavLink
-                to={"/my-courses"}
-                className={({ isActive }) =>
-                  `px-3 py-2 rounded-full transition text-sm lg:text-base ${
-                    isActive
-                      ? "bg-blue-500 text-white shadow-md"
-                      : scrolled
-                      ? "text-white hover:bg-blue-500/50 hover:text-white"
-                      : "text-gray-700 hover:bg-blue-100/50 hover:text-blue-600"
-                  }`
-                }
-              >
-                আমার কোর্সসমুহ
-              </NavLink>
-              }
-              <Link
-                to={`/${user.role}`}
-                className={`px-3 py-2 rounded-full transition font-semibold text-sm lg:text-base ${
-                  scrolled
-                    ? "text-white hover:bg-blue-500/50"
-                    : "text-gray-800 hover:bg-blue-100/50 hover:text-blue-600"
-                }`}
-              >
-                ড্যাশবোর্ড
-              </Link>
+                  to={"/my-courses"}
+                  className={({ isActive }) =>
+                    `px-3 py-2 rounded-full transition text-sm lg:text-base ${
+                      isActive
+                        ? "bg-blue-500 text-white shadow-md"
+                        : scrolled
+                        ? "text-white hover:bg-blue-500/50 hover:text-white"
+                        : "text-gray-700 hover:bg-blue-100/50 hover:text-blue-600"
+                    }`
+                  }
+                >
+                  আমার কোর্সসমুহ
+                </NavLink>
+              )}
+              {user.role !== "student" && (
+                <Link
+                  to={`/${user.role}`}
+                  className={`px-3 py-2 rounded-full transition font-semibold text-sm lg:text-base ${
+                    scrolled
+                      ? "text-white hover:bg-blue-500/50"
+                      : "text-gray-800 hover:bg-blue-100/50 hover:text-blue-600"
+                  }`}
+                >
+                  ড্যাশবোর্ড
+                </Link>
+              )}
               <Link
                 to={"/profile"}
                 className={`p-2 rounded-full transition ${
