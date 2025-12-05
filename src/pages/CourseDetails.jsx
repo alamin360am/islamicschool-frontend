@@ -18,7 +18,6 @@ import {
   FiAward,
   FiShare2,
   FiHeart,
-  FiMail,
 } from "react-icons/fi";
 import { FaChalkboardTeacher, FaRegClock, FaStarHalfAlt } from "react-icons/fa";
 import { IoIosTrendingUp } from "react-icons/io";
