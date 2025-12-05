@@ -14,8 +14,7 @@ const AddQuestionCategory = () => {
     setLoading(true);
     try {
       const res = await api.get("/qna/questionCategory");
-      console.log(res);
-      
+   
       if (res.data.success) {
         setAllCategory(res.data.categories);
       } else {

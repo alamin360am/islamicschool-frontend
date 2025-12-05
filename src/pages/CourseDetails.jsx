@@ -107,7 +107,6 @@ const CourseDetails = () => {
   const handleEnrollClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log("Enroll button clicked");
     setShowPaymentModal(true);
   };
 

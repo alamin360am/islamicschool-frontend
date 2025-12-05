@@ -35,7 +35,6 @@ const QnaAdmin = () => {
       setLoading(true);
       const { data } = await api.get("/qna");
       setQuestions(data.questions);
-      console.log(data.questions);
     } catch (err) {
       toast.error("Failed to load questions", err.message);
     } finally {

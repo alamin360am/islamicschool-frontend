@@ -38,7 +38,6 @@ const QuestionDetailsAdmin = () => {
     try {
       const res = await api.get(`/admin/qna/${id}`);
       setQuestion(res.data.question);
-      console.log(res.data.question);
     } catch (error) {
       console.error("Error fetching question:", error);
     } finally {
@@ -99,7 +98,6 @@ const QuestionDetailsAdmin = () => {
           toast.error(res.data.message);
         }
       } catch (error) {
-        console.log(error);
         const msg = error.response?.data?.message || "Something went wrong!";
         toast.error(msg);
       } finally {

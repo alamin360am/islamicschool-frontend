@@ -23,7 +23,6 @@ const Question = () => {
     setLoading(true);
     try {
       const res = await api.get(`/qna/${id}`);
-      console.log(res.data.question);
 
       setQuestion(res.data.question);
     } catch (error) {

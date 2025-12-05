@@ -12,8 +12,6 @@ const Carousel = () => {
     try {
       setLoading(true);
       const res = await api.get("/courses/featuredCourse");
-
-      console.log(res.data.courses);
       
       if (res.data.success) {
         setCourses(res.data.courses);

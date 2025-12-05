@@ -27,8 +27,6 @@ const QnA = () => {
       const res = await api.get("/qna/publishQuestion");
       if (res.data.success) {
         setQuestions(res.data.questions);
-        console.log(res.data.questions);
-
         setLoading(false);
       }
     } catch (error) {

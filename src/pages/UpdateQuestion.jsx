@@ -42,8 +42,6 @@ const UpdateQuestion = () => {
     const fetchCategories = async () => {
       try {
         const res = await api.get("/qna/questionCategory");
-
-        console.log(res.data.categories);
         
         setCategories(res.data.categories);
       } catch (error) {

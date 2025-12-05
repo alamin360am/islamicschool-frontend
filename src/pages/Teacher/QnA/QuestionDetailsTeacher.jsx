@@ -41,7 +41,6 @@ const QuestionDetailsTeacher = () => {
     try {
       const res = await api.get(`/qna/teacher/${id}`);
       setQuestion(res.data.question);
-      console.log(res.data.question);
     } catch (error) {
       console.error("Error fetching question:", error);
     } finally {

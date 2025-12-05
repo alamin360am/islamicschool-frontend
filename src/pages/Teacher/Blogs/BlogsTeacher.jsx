@@ -33,7 +33,6 @@ const BlogsTeacher = () => {
     try {
       setLoading(true);
       const { data } = await api.get("/blogs/my-blogs");
-      console.log(data);
 
       if (data) {
         setBlogs(data);

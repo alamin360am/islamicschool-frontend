@@ -39,8 +39,6 @@ const VerifyOtp = () => {
     setMessage("");
 
     try {
-      console.log(formData);
-
       const response = await verifyOtp(formData.email, formData.code);
 
       if (response?.success) {

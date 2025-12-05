@@ -33,7 +33,6 @@ const BlogsAdmin = () => {
     try {
       setLoading(true);
       const { data } = await api.get("/admin/blogs");
-      console.log(data);
       setBlogs(data);
     } catch (err) {
       toast.error("Failed to load blogs", err.message);

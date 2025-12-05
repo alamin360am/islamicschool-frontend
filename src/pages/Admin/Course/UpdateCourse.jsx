@@ -50,7 +50,6 @@ const UpdateCourse = () => {
   const fetchCourse = useCallback(async () => {
     try {
       const res = await api.get(`/courses/${id}`);
-      console.log(res);
 
       if (res.data) {
         const courseData = res.data;
@@ -267,14 +266,6 @@ const UpdateCourse = () => {
       const endDate = new Date(enrollmentEnd).toISOString();
       const courseStartDate = new Date(courseStart).toISOString();
 
-      console.log("Date conversion:");
-      console.log("enrollmentStart (input):", enrollmentStart);
-      console.log("enrollmentStart (ISO):", startDate);
-      console.log("enrollmentEnd (input):", enrollmentEnd);
-      console.log("enrollmentEnd (ISO):", endDate);
-      console.log("courseStart (input):", courseStart);
-      console.log("courseStart (ISO):", courseStartDate);
-
       formData.append("title", title);
       formData.append("price", price.toString());
       formData.append("description", editorContent);
@@ -295,12 +286,6 @@ const UpdateCourse = () => {
 
       if (cover) {
         formData.append("thumbnail", cover);
-      }
-
-      // Final debug log
-      console.log("=== FINAL FORM DATA ===");
-      for (let [key, value] of formData.entries()) {
-        console.log(`${key}:`, value);
       }
 
       const { data } = await api.put(`/courses/${id}`, formData, {

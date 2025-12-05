@@ -22,7 +22,6 @@ const Blog = () => {
     setLoading(true);
     try {
       const res = await api.get(`/blogs/publishedBlog/${id}`);
-      console.log(res.data.blogs);
       
       setBlog(res.data.blogs);
     } catch (error) {

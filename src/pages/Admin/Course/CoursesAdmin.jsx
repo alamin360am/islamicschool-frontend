@@ -38,7 +38,6 @@ const CoursesAdmin = () => {
     try {
       setLoading(true);
       const { data } = await api.get("/courses");
-      console.log(data);
       setCourses(data);
     } catch (err) {
       toast.error("Failed to load courses", err.message);

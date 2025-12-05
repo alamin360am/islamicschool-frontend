@@ -65,8 +65,6 @@ const AskQuestion = () => {
 
       const res = await api.post("/qna", formData);
 
-      console.log(res);
-
       if (res.data.success) {
         toast.success("Question submitted successfully!");
         navigate("/admin/questions");
