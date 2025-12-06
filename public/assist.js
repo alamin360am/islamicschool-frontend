@@ -5,7 +5,6 @@ import {
   FaNewspaper,
   FaCircleQuestion,
   FaBook,
-  FaQuestion,
 } from "react-icons/fa6";
 
 export const Nav_Item = [
@@ -27,7 +26,7 @@ export const admin_nav_item = [
   { id: "blogs", label: "ব্লগ সমুহ", path: "/admin/blogs", icon: FaNewspaper },
   {
     id: "questions",
-    label: "Questions",
+    label: "প্রশ্ন সমুহ",
     path: "/admin/questions",
     icon: FaCircleQuestion,
   },
@@ -48,9 +47,9 @@ export const teacher_nav_item = [
     icon: FaNewspaper,
   },
   {
-    id: "questions",
+    id: "প্রশ্ন সমুহ",
     label: "Questions",
     path: "/teacher/questions",
-    icon: FaQuestion,
+    icon: FaCircleQuestion,
   },
 ];

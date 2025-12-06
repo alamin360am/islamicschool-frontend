@@ -5,6 +5,7 @@ import { Link, useLocation, useNavigate } from "react-router";
 import { FiBookOpen } from "react-icons/fi";
 import { FaHome } from "react-icons/fa";
 import { teacher_nav_item } from "../../public/assist";
+import logo from "./../../public/Logo-white.png";
 
 const TeacherNavBar = ({ sidebarOpen, setSidebarOpen }) => {
   const navigate = useNavigate();
@@ -27,14 +28,16 @@ const TeacherNavBar = ({ sidebarOpen, setSidebarOpen }) => {
         className={`fixed lg:relative z-50 w-64 h-screen bg-gradient-to-b from-green-600 to-emerald-700 text-white flex flex-col shadow-lg
         ${sidebarOpen ? "block" : "hidden lg:flex"} overflow-y-scroll`}
       >
-        <div className="p-6">
-          <h1 className="text-lg font-bold flex items-center">
-            <FiBookOpen className="mr-2" />
-            IslamicLearn Admin
-          </h1>
-          <p className="text-green-100 text-sm mt-1">
-            Administration Dashboard
-          </p>
+        <div className="px-6 py-6 flex gap-2 items-center text-lg font-medium">
+          <img
+            src={logo}
+            alt="Website Logo"
+            className="h-6 w-auto md:h-8 lg:h-10 object-contain transition-all duration-300"
+          />
+          <div className="flex flex-col">
+            <h2>শিক্ষক ড্যাশবোর্ড</h2>
+            <p className="text-xs">সকল শিক্ষক অ্যাক্সেস এখানে</p>
+          </div>
         </div>
 
         <nav className="flex-1 px-4 py-4">
@@ -67,7 +70,7 @@ const TeacherNavBar = ({ sidebarOpen, setSidebarOpen }) => {
             className="w-full flex items-center px-4 py-3 text-green-100 hover:bg-white/10 rounded-xl transition"
           >
             <FaHome className="mr-3" />
-            Go to Home
+            হোমে ফিরে যান
           </button>
         </div>
       </motion.div>

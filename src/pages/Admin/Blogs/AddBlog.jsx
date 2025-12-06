@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
+import { useAuth } from "../../../hooks/useAuth";
 
 const AddBlog = () => {
   const [title, setTitle] = useState("");
@@ -18,6 +19,8 @@ const AddBlog = () => {
   const editorRef = useRef(null);
   const quillRef = useRef(null);
   const navigate = useNavigate();
+
+  const {user} = useAuth();
 
   // Fetch categories
   const fetchCategories = async () => {
@@ -95,7 +98,7 @@ const AddBlog = () => {
 
       if (data.success) {
         toast.success("✅ Blog created successfully!");
-        navigate("/admin/blogs");
+        navigate(`/${user.role}/blogs`);
         setTitle("");
         if (quillRef.current) quillRef.current.setContents([]);
         setCover(null);

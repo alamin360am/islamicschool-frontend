@@ -92,7 +92,7 @@ const Home = () => {
           >
             <motion.div {...bounceAnimation}>
               <button className="border-2 border-green-600 text-green-600 px-6 py-3 rounded-2xl font-semibold hover:bg-green-600 hover:text-white transition shadow-lg">
-                View All Courses
+                <Link to={"/courses"}>View All Courses</Link>
               </button>
             </motion.div>
           </motion.div>

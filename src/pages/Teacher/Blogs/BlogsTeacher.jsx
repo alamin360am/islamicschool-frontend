@@ -32,8 +32,8 @@ const BlogsTeacher = () => {
   const fetchBlogs = async () => {
     try {
       setLoading(true);
-      const { data } = await api.get("/blogs/my-blogs");
-
+      const {data} = await api.get("/blogs/my-blogs");
+      
       if (data) {
         setBlogs(data);
       }

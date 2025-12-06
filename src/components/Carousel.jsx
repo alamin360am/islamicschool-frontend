@@ -12,6 +12,9 @@ const Carousel = () => {
     try {
       setLoading(true);
       const res = await api.get("/courses/featuredCourse");
+
+      console.log(res.data.courses);
+      
       
       if (res.data.success) {
         setCourses(res.data.courses);
@@ -152,7 +155,7 @@ const Carousel = () => {
   );
 
   return (
-    <div className="relative w-full max-w-7xl mx-auto pt-20 lg:pt-8 px-4 py-8">
+    <div className="relative font-hind w-full max-w-7xl mx-auto pt-20 lg:pt-8 px-4 py-8">
       <style jsx global>{`
         @keyframes neon-glow {
           0%, 100% {

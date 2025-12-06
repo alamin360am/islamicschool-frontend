@@ -15,6 +15,7 @@ import {
   FiDownload,
 } from "react-icons/fi";
 import { useNavigate, useParams } from "react-router-dom";
+import { useAuth } from "../../../hooks/useAuth";
 
 const UpdateLecture = () => {
   const { courseId, lectureId } = useParams();
@@ -27,13 +28,15 @@ const UpdateLecture = () => {
   const [course, setCourse] = useState(null);
   const navigate = useNavigate();
 
+  const {user} = useAuth()
+
   // Fetch lecture and course details
   useEffect(() => {
     const fetchData = async () => {
       try {
         setFetchLoading(true);
         const [courseRes, lectureRes] = await Promise.all([
-          api.get(`/courses/${courseId}`),
+          api.get(`/courses/courseDetails/${courseId}`),
           api.get(`/courses/lectures/${lectureId}`),
         ]);        
 
@@ -145,7 +148,7 @@ const UpdateLecture = () => {
 
       if (data.success) {
         toast.success("✅ Lecture updated successfully!");
-        navigate(`/admin/courses/${courseId}`);
+        navigate(`/${user.role}/courses/${courseId}`);
       }
     } catch (error) {
       console.error("Update lecture error:", error);
@@ -177,7 +180,7 @@ const UpdateLecture = () => {
         className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
       >
         <button
-          onClick={() => navigate(`/admin/courses/${courseId}`)}
+          onClick={() => navigate(`/${user.role}/courses/${courseId}`)}
           className="flex items-center px-4 py-2 text-gray-600 hover:bg-white rounded-xl transition"
         >
           <FiArrowLeft className="mr-2" /> Back to Course

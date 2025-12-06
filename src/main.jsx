@@ -59,6 +59,9 @@ import BlogsTeacher from "./pages/Teacher/Blogs/BlogsTeacher";
 import BlogDetailsTeacher from "./pages/Teacher/Blogs/BlogDetailsTeacher";
 import QnaTeacher from "./pages/Teacher/QnA/QnATeacher";
 import QuestionDetailsTeacher from "./pages/Teacher/QnA/QuestionDetailsTeacher";
+import TeacherDashboard from "./pages/Teacher/TeacherDashboard";
+import CoursesTeacher from "./pages/Teacher/Course/CoursesTeacher";
+import CourseDetailsTeacher from "./pages/Teacher/Course/CourseDetailsTeacher";
 
 const router = createBrowserRouter([
   {
@@ -157,10 +160,10 @@ const router = createBrowserRouter([
           {
             element: <AdminLayout />,
             children: [
-              { path: "", element: <AdminDashboard /> },
+              { path: "", element: <TeacherDashboard /> },
               // Course
-              { path: "courses", element: <CoursesAdmin /> },
-              { path: "courses/:id", element: <CourseDetailsAdmin /> },
+              { path: "courses", element: <CoursesTeacher /> },
+              { path: "courses/:id", element: <CourseDetailsTeacher /> },
               { path: "courses/:courseId/AddLecture", element: <AddLecture /> },
               {
                 path: "courses/:courseId/lectures/edit/:lectureId",

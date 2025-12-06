@@ -13,6 +13,7 @@ import {
   FiLink,
 } from "react-icons/fi";
 import { useNavigate, useParams } from "react-router-dom";
+import { useAuth } from "../../../hooks/useAuth";
 
 const AddLecture = () => {
   const { courseId } = useParams();
@@ -23,14 +24,16 @@ const AddLecture = () => {
   const [course, setCourse] = useState(null);
   const navigate = useNavigate();
 
+  const {user} = useAuth()
+
   // Fetch course details
   useEffect(() => {
     const fetchCourse = async () => {
       try {
         const res = await api.get(`/courses/courseDetails/${courseId}`);
 
-        if (res.data) {
-          setCourse(res.data);
+        if (res.data.success) {
+          setCourse(res.data.course);
         }
       } catch (error) {
         toast.error("Failed to fetch course details", error);
@@ -107,7 +110,7 @@ const AddLecture = () => {
 
       if (data.success) {
         toast.success("✅ Lecture created successfully!");
-        navigate(`/admin/courses/${courseId}`);
+        navigate(`/${user.role}/courses/${courseId}`);
       }
     } catch (error) {
       console.error("Create lecture error:", error);
@@ -128,7 +131,7 @@ const AddLecture = () => {
         className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
       >
         <button
-          onClick={() => navigate(`/admin/courses/${courseId}`)}
+          onClick={() => navigate(`/${user.role}/courses/${courseId}`)}
           className="flex items-center px-4 py-2 text-gray-600 hover:bg-white rounded-xl transition"
         >
           <FiArrowLeft className="mr-2" /> Back to Course
@@ -297,7 +300,7 @@ const AddLecture = () => {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Total Lectures:</span>
                   <span className="font-medium">
-                    {course?.lectureCount || 0}
+                    {course?.lectures?.length || 0}
                   </span>
                 </div>
                 <div className="flex justify-between">
