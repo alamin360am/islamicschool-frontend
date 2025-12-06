@@ -33,7 +33,7 @@ const Instructors = () => {
   return (
     <section
       id="instructors"
-      className="relative pb-16 px-6 bg-gradient-to-b from-white to-amber-50 z-10"
+      className="relative py-16 px-6 bg-gradient-to-b from-white to-amber-50 z-10"
     >
       <div className="max-w-7xl mx-auto">
         <motion.div

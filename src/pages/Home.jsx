@@ -16,6 +16,7 @@ import PopularQuestion from "../components/PopularQuestion";
 import FeaturedCourses from "../components/FeaturedCourses";
 import Carousel from "../components/Carousel";
 import Instructors from "../components/Instructors";
+import DirectorVoice from "../components/DirectorVoice";
 
 const Home = () => {
   const bounceAnimation = {
@@ -98,69 +99,14 @@ const Home = () => {
           </motion.div>
         </div>
       </section>
+      
+      {/* Director's Voice */}
 
-      {/* Enhanced Stats Section */}
-      <section className="relative py-16 mb-16 bg-gradient-to-r from-green-600 to-emerald-500 text-white overflow-hidden">
-        {/* Animated Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          {[...Array(20)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute text-white"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-              animate={{
-                scale: [0, 1, 0],
-                rotate: [0, 360],
-              }}
-              transition={{
-                duration: 4 + Math.random() * 4,
-                repeat: Infinity,
-                delay: Math.random() * 2,
-              }}
-            >
-              <FiStar size={20} />
-            </motion.div>
-          ))}
-        </div>
-
-        <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            {[
-              { number: "5,000+", label: "Happy Students", icon: "😊" },
-              { number: "50+", label: "Qualified Teachers", icon: "👨‍🏫" },
-              { number: "15+", label: "Courses", icon: "📖" },
-              { number: "98%", label: "Satisfaction Rate", icon: "⭐" },
-            ].map((stat, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 20, scale: 0.8 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ duration: 0.6, delay: idx * 0.1 }}
-                viewport={{ once: true }}
-                className="p-4"
-              >
-                <motion.div
-                  className="text-4xl mb-2"
-                  whileHover={{ scale: 1.2, rotate: 360 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {stat.icon}
-                </motion.div>
-                <div className="text-3xl md:text-4xl font-bold mb-2">
-                  {stat.number}
-                </div>
-                <div className="text-green-100">{stat.label}</div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <DirectorVoice />
 
       {/* Enhanced Instructors Section */}
       <Instructors />
+
 
       {/* Enhanced Feedback Section */}
       <section

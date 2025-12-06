@@ -1,11 +1,6 @@
 import React, { useEffect, useState } from "react";
-// eslint-disable-next-line no-unused-vars
-import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import api from "../utils/axios";
-import { FiBook, FiBookOpen, FiCalendar, FiClock, FiDollarSign, FiEye, FiStar } from "react-icons/fi";
-import { FaChalkboardTeacher } from "react-icons/fa";
-import { Link } from "react-router";
 import CourseCard from "./CourseCard";
 
 const FeaturedCourses = () => {
