@@ -1,10 +1,25 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import TypingAnimation from "./TypingAnimation";
 import { FiBook, FiUser } from "react-icons/fi";
+import api from "../utils/axios";
 
 const DirectorVoice = () => {
+  const [directorVoice, setDirectorVoice] = useState(null);
+  const fetchVoice = async () => {
+    try {
+      const res = await api.get("/documentation");
+      setDirectorVoice(res?.data?.data[0]?.sections?.directorVoice);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchVoice();
+  }, []);
+
   return (
     <section
       id="director-message"
@@ -44,7 +59,7 @@ const DirectorVoice = () => {
           transition={{ duration: 0.7 }}
           viewport={{ once: true }}
         >
-          <h2 className="text-4xl font-bold text-gray-800 mb-3 tracking-tight">
+          <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-3 tracking-tight">
             পরিচালকের বাণী
           </h2>
           <div className="w-28 h-1 bg-green-600 mx-auto rounded-full"></div>
@@ -61,8 +76,8 @@ const DirectorVoice = () => {
             viewport={{ once: true }}
           >
             <div className="relative">
-              <div className="w-60 h-60 md:w-72 md:h-72 rounded-full bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center shadow-[0_20px_50px_rgba(0,0,0,0.2)]">
-                <FiUser className="text-white drop-shadow-lg" size={140} />
+              <div className="w-60 h-60 md:w-72 md:h-72 rounded-full bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center shadow-[0_20px_50px_rgba(0,0,0,0.2)] overflow-hidden">
+                <img src={directorVoice?.image} alt={directorVoice?.designation} className="w-full" />
               </div>
 
               {/* Floating Name Box */}
@@ -72,8 +87,8 @@ const DirectorVoice = () => {
                 transition={{ duration: 2.5, repeat: Infinity }}
               >
                 <div className="text-center">
-                  <h3 className="font-bold text-green-700">মুজাহিদুল ইসলাম</h3>
-                  <p className="text-sm text-gray-600">প্রতিষ্ঠাতা ও পরিচালক</p>
+                  <h3 className="font-bold text-green-700">{directorVoice?.name}</h3>
+                  <p className="text-sm text-gray-600">{directorVoice?.designation}</p>
                 </div>
               </motion.div>
             </div>
@@ -90,21 +105,10 @@ const DirectorVoice = () => {
             <div className="p-6 md:p-10 rounded-3xl bg-white/60 backdrop-blur-lg shadow-xl border border-white/40 transition-all">
               <div className="text-gray-700 text-lg leading-relaxed text-justify">
                 <TypingAnimation
-                  text={`আসসালামু আলাইকুম ওয়া রাহমাতুল্লাহ। 
-
-বিসমিল্লাহির রাহমানির রাহীম।
-
-প্রিয় অভিভাবক ও শিক্ষার্থীবৃন্দ,
-
-আলহামদুলিল্লাহ, ইসলামিক কিডস লার্নিং প্ল্যাটফর্মের মাধ্যমে আমাদের সন্তানদের আল্লাহর পথে শিক্ষিত করার সুযোগ পেয়ে আমরা গর্বিত। আমাদের লক্ষ্য শুধুমাত্র ধর্মীয় শিক্ষা দেওয়া নয়, বরং পূর্ণাঙ্গ ইসলামিক ব্যক্তিত্ব গঠন করা।
-
-প্রযুক্তির এই যুগে আমাদের শিশুরা যখন বিভিন্ন অপ্রয়োজনীয় বিষয়ে সময় নষ্ট করছে, তখন তাদের জন্য একটি নিরাপদ ও শিক্ষামূলক পরিবেশ তৈরি করাই আমাদের প্রধান উদ্দেশ্য। আমরা বিশ্বাস করি, সঠিক ইসলামিক শিক্ষাই পারে আমাদের পরবর্তী প্রজন্মকে ঈমানের সঙ্গে বেড়ে উঠতে সাহায্য করতে।
-
-আল্লাহ আমাদের এই প্রচেষ্টা কবুল করুন এবং আমাদের সকলকে সিরাতুল মুস্তাকীমের পথে অবিচল রাখুন। আমীন।
-
-জাযাকুমুল্লাহু খাইরান।`}
+                  text={directorVoice?.text}
                   speed={20}
                   delay={800}
+                  className={"text-base md:text-lg"}
                 />
               </div>
 
