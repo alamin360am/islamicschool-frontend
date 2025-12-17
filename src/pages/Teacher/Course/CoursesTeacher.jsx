@@ -35,7 +35,6 @@ const CoursesTeacher = () => {
     try {
       setLoading(true);
       const res = await api.get("/courses/teacherCourses");
-      console.log(res.data.data);
             
       setCourses(res.data.data);
     } catch (err) {

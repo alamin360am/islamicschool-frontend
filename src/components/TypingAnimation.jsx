@@ -17,14 +17,16 @@ const TypingAnimation = ({ text, speed = 30, delay = 0, className = "" }) => {
   }, [delay]);
 
   useEffect(() => {
-    if (!started || currentIndex >= text.length) return;
+    if (text) {
+      if (!started || currentIndex >= text.length) return;
 
-    const typingTimer = setTimeout(() => {
-      setDisplayedText((prev) => prev + text[currentIndex]);
-      setCurrentIndex((prev) => prev + 1);
-    }, speed);
+      const typingTimer = setTimeout(() => {
+        setDisplayedText((prev) => prev + text[currentIndex]);
+        setCurrentIndex((prev) => prev + 1);
+      }, speed);
 
-    return () => clearTimeout(typingTimer);
+      return () => clearTimeout(typingTimer);
+    }
   }, [currentIndex, text, speed, started]);
 
   return (

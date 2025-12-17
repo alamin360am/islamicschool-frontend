@@ -24,7 +24,7 @@ const AddLecture = () => {
   const [course, setCourse] = useState(null);
   const navigate = useNavigate();
 
-  const {user} = useAuth()
+  const { user } = useAuth();
 
   // Fetch course details
   useEffect(() => {
@@ -79,14 +79,11 @@ const AddLecture = () => {
       return;
     }
 
-    if (!videoUrl.trim()) {
-      toast.error("Video URL is required");
-      return;
-    }
-
-    if (!validateVideoUrl(videoUrl)) {
-      toast.error("Please enter a valid video URL");
-      return;
+    if (videoUrl) {
+      if (!validateVideoUrl(videoUrl)) {
+        toast.error("Please enter a valid video URL");
+        return;
+      }
     }
 
     try {
@@ -184,7 +181,6 @@ const AddLecture = () => {
                   onChange={(e) => setVideoUrl(e.target.value)}
                   placeholder="https://example.com/video.mp4"
                   className="w-full p-4 text-lg bg-gray-100 rounded-xl focus:ring-2 focus:ring-green-300 outline-none"
-                  required
                 />
 
                 <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">

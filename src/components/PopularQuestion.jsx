@@ -41,7 +41,7 @@ const PopularQuestion = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: idx * 0.1 }}
           viewport={{ once: true }}
-          className="bg-white shadow-lg rounded-2xl overflow-hidden hover:shadow-xl transition"
+          className="shadow-lg rounded-2xl overflow-hidden hover:shadow-xl transition"
         >
           <div className="p-6">
             <div className="flex justify-between items-start mb-3">

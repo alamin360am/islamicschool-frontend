@@ -23,7 +23,7 @@ const DirectorVoice = () => {
   return (
     <section
       id="director-message"
-      className="relative pb-16 pt-20 px-6 bg-gradient-to-b from-white via-blue-50/40 to-blue-100/60 overflow-hidden"
+      className="relative pb-16 pt-16 px-6 bg-gradient-to-b from-white via-blue-50/40 to-blue-100/60 overflow-hidden"
     >
       {/* Floating Background Icons */}
       <div className="absolute inset-0 pointer-events-none opacity-10">

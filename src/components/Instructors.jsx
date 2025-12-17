@@ -33,25 +33,9 @@ const Instructors = () => {
   return (
     <section
       id="instructors"
-      className="relative py-16 px-6 bg-gradient-to-b from-white to-amber-50 z-10"
+      className="relative px-6 z-10"
     >
       <div className="max-w-7xl mx-auto">
-        <motion.div
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true, margin: "-100px" }}
-        >
-          <h2 className="text-3xl font-bold text-gray-800 mb-4">
-            Meet Our Super Instructors! 🎓
-          </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Our passionate and qualified teachers are dedicated to making
-            Islamic education engaging and meaningful for your children.
-          </p>
-        </motion.div>
-
         <div className="grid md:grid-cols-3 gap-8">
           {teachers?.map((inst, idx) => (
             <motion.div

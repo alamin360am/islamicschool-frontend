@@ -36,15 +36,15 @@ const TeacherDashboard = () => {
     };
 
     const fetchCourses = async () => {
-      const res = await api.get("/courses");
+      const res = await api.get("/courses/teacherCourses");
 
-      setTotalCourses(res.data.length);
-      const sliceCourse = res.data.slice(0, 5);
+      setTotalCourses(res.data.data.length);
+      const sliceCourse = res.data.data.slice(0, 5);
       setCourses(sliceCourse);
     };
 
     const fetchBlogs = async () => {
-      const res = await api.get("/admin/blogs");
+      const res = await api.get("/blogs/my-blogs");      
 
       setTotalBlogs(res.data.length);
       const sliceBlog = res.data.slice(0, 5);
@@ -177,7 +177,7 @@ const TeacherDashboard = () => {
                 Recent Blogs
               </h2>
               <Link
-                to={"/admin/blogs"}
+                to={"/teacher/blogs"}
                 className="text-emerald-600 text-sm font-medium hover:text-emerald-700 flex items-center gap-1 transition-colors"
               >
                 View All
@@ -188,7 +188,7 @@ const TeacherDashboard = () => {
           <div className="p-4 space-y-3">
             {blogs?.map((blog) => (
               <Link
-                to={`/admin/blogs/${blog._id}`}
+                to={`/teacher/blogs/${blog._id}`}
                 key={blog._id}
                 className="flex items-center justify-between p-3 bg-gray-50/50 hover:bg-emerald-50 rounded-xl transition-all duration-200 group border border-transparent hover:border-emerald-100"
               >
@@ -244,7 +244,7 @@ const TeacherDashboard = () => {
           <div className="p-4 space-y-3">
             {questions?.map((question) => (
               <Link
-                to={`/admin/questions/${question._id}`}
+                to={`/teacher/questions/${question._id}`}
                 key={question._id}
                 className="flex items-center justify-between p-3 bg-gray-50/50 hover:bg-blue-50 rounded-xl transition-all duration-200 group border border-transparent hover:border-blue-100"
               >
@@ -288,7 +288,7 @@ const TeacherDashboard = () => {
                 Course Performance
               </h2>
               <Link
-                to={"/admin/courses"}
+                to={"/teacher/courses"}
                 className="text-purple-600 text-sm font-medium hover:text-purple-700 flex items-center gap-1 transition-colors"
               >
                 View All
@@ -298,7 +298,7 @@ const TeacherDashboard = () => {
           </div>
           <div className="p-4 space-y-3">
             {courses?.map((course, i) => (
-              <Link to={`/admin/courses/${course._id}`}
+              <Link to={`/teacher/courses/${course._id}`}
                 key={i}
                 className="flex items-center justify-between p-3 bg-gray-50/50 hover:bg-purple-50 rounded-xl transition-all duration-200 group border border-transparent hover:border-purple-100"
               >
@@ -339,28 +339,12 @@ const TeacherDashboard = () => {
       >
         {[
           {
-            title: "Manage Students",
-            icon: FiUsers,
-            actionIcon: FiEdit,
-            gradient: "from-emerald-500 to-green-500",
-            description: "Add, edit, or remove student accounts",
-            to: "/admin/users",
-          },
-          {
-            title: "Create Course",
-            icon: FiBook,
-            actionIcon: FiPlus,
-            gradient: "from-blue-500 to-cyan-500",
-            description: "Design and publish new courses",
-            to: "/admin/courses/add",
-          },
-          {
             title: "Create Blog",
             icon: FiBarChart2,
             actionIcon: FiTrendingUp,
             gradient: "from-purple-500 to-fuchsia-500",
             description: "Publish your thought and experience",
-            to: "/admin/blogs/add",
+            to: "/teacher/blogs/add",
           },
         ].map((card, idx) => (
           <Link to={card.to} key={idx}>

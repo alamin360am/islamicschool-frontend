@@ -155,7 +155,7 @@ const Carousel = () => {
   );
 
   return (
-    <div className="relative font-hind w-full max-w-7xl mx-auto pt-20 lg:pt-8 px-4 py-8">
+    <div className="relative font-hind w-full max-w-7xl mx-auto pt-20 lg:pt-8 px-4">
       <style jsx global>{`
         @keyframes neon-glow {
           0%, 100% {
@@ -240,7 +240,7 @@ const Carousel = () => {
                       </div>
 
                       {/* Title - Fixed to show properly */}
-                      <h3 className="text-sm sm:text-lg md:text-2xl lg:text-3xl font-bold leading-tight line-clamp-2 mb-2 sm:mb-3">
+                      <h3 className="sm:text-lg md:text-2xl lg:text-3xl font-bold leading-tight line-clamp-2 mb-2 sm:mb-3">
                         {course.title}
                       </h3>
 
@@ -258,13 +258,13 @@ const Carousel = () => {
                     {/* Student Count */}
                     <div className="text-right ml-4 flex-shrink-0">
                       <div className="glass-effect px-2 sm:px-3 py-1 sm:py-2 rounded-xl text-center">
-                        <div className="text-lg sm:text-xl md:text-2xl font-bold">{course.studentCount || 0}</div>
+                        <div className="sm:text-sm md:text-2xl font-bold">{course.studentCount || 0}</div>
                         <div className="text-xs opacity-90">শিক্ষার্থী</div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Course Stats - Made more compact */}
+                  {/* Course Stats */}
                   <div className="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6 flex-shrink-0">
                     <div className="flex items-center space-x-2">
                       <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -318,7 +318,7 @@ const Carousel = () => {
                   {/* Price & CTA - Made more compact */}
                   <div className="flex items-center justify-between pt-3 sm:pt-4 border-t border-white/20 mt-auto">
                     <div className="min-w-0">
-                      <div className="text-xl sm:text-2xl md:text-3xl font-bold">{formatPrice(course.price)}</div>
+                      <div className="sm:text-xl md:text-2xl font-bold">{formatPrice(course.price)}</div>
                       {course.enrollmentEnd && (
                         <div className="text-xs sm:text-sm opacity-90 mt-1">
                           ⏰ এনরোলমেন্ট শেষ: {new Date(course.enrollmentEnd).toLocaleDateString('bn-BD')}
@@ -352,7 +352,7 @@ const Carousel = () => {
       </div>
 
       {/* Navigation Dots */}
-      <div className="flex justify-center space-x-4 mt-6">
+      <div className="flex justify-center space-x-4 mt-6 md:hidden">
         {courses?.map((course, index) => (
           <button
             key={index}
