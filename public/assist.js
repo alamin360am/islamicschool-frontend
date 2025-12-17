@@ -12,6 +12,7 @@ export const Nav_Item = [
   { path: "/courses", label: "কোর্স সমুহ" },
   { path: "/blogs", label: "ব্লগ সমুহ" },
   { path: "/qa", label: "প্রশ্নোত্তর" },
+  { path: "/about", label: "আমাদের সম্পর্কে" },
 ];
 
 export const admin_nav_item = [

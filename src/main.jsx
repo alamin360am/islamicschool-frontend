@@ -62,6 +62,7 @@ import QuestionDetailsTeacher from "./pages/Teacher/QnA/QuestionDetailsTeacher";
 import TeacherDashboard from "./pages/Teacher/TeacherDashboard";
 import CoursesTeacher from "./pages/Teacher/Course/CoursesTeacher";
 import CourseDetailsTeacher from "./pages/Teacher/Course/CourseDetailsTeacher";
+import AboutUs from "./pages/AboutUs";
 
 const router = createBrowserRouter([
   {
@@ -83,6 +84,7 @@ const router = createBrowserRouter([
       { path: "/blogs", element: <Blogs /> },
       { path: "/blogs/:id", element: <Blog /> },
       { path: "/qa", element: <QnA /> },
+      { path: "/about", element: <AboutUs /> },
       { path: "/forget-password", element: <ForgotPassword /> },
       { path: "/reset-password/:token", element: <ResetPassword /> },
 
